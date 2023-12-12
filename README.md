@@ -1,6 +1,6 @@
 # Something about how to improve performance that I learned from MyFiles and other projects :)
 ## 🚀 Introduction
-I think after 5 years worked in MyFiles team of SRV, I have learned more tricks about improve performance (mainly in Android development). So, I want to write it down not only save as a note for myself, but also I want to share with you these. Maybe, something you have known, or not. But I think you can pleasant, review and do not hesitate to give me some suggestions to make this repo really meaningfully. And one thing :) This repo was writtern by myself, when I got a strange feeling status after drinking more last night. Last night, my team have a self-celebrate year end party with current & old member. It's more happy and memorable. So, if you see this repo quite messy (I think it 😆), please do not blame me. Wish you happy when reading it. 😂
+I think after 5 years worked in MyFiles team of SRV, I have learned more tricks about improve performance (mainly in Android development). So, I want to write it down not only save as a note for myself, but also I want to share with you these. Maybe, something you have known, or not. But I think you can pleasant, review and do not hesitate to give me some suggestions to make this repo really meaningfully. And one thing :) This repo was writtern by myself, when I got a strange feeling status after drinking more last night. Last night, my team have a self-celebrate year end party with current & old member. It's more happy and memorable. So, if you see this repo quite messy (I think it 😆), please do not blame me. Wish you happy when reading it, and help more overview before improve performance for anything. 😂
 
 ## 📖 Details
 ✔️ Improve delete from Media Provider
@@ -8,13 +8,13 @@ I think after 5 years worked in MyFiles team of SRV, I have learned more tricks 
 - Using set IN of `id` instead compare by `name` column.
 
 ✔️ Optimize entry performance when open Analyze Storage first time
-- Move heavy task to background (Dispatchers.IO in viewModelScope).
+- Move heavy task to background (`Dispatchers.IO` in viewModelScope).
 - Show loading view when executing heavy task.
 - After heavy task execute completed, turn off loading view and show load result.
 
 ✔️ Improve coroutine job get many bitmaps from Watch
 - Separate get one bitmap logic to a launch/async scope (load simultaneously).
-- Using joinAll() to join all job.
+- Using `joinAll()` to join all job.
 
 ✔️ Check had any children in a directory
 - Instead using API list(), let using getDirectoryStream() of directory.
@@ -44,8 +44,9 @@ I think after 5 years worked in MyFiles team of SRV, I have learned more tricks 
 
 ✔️ Using `StringBuilder` to append/insert string instead using `plus` operator to concat string
 
-✔️ Using `SparseArray` to replace `HashMap` if key is integer and increasing
+✔️ Using `SparseArray` to replace `HashMap` if key is integer and `increasing`
 - Using `append()` instead `put`.
+- `append` is the method that `puts a key/value pair into the array, optimizing for the case where the key is greater than all existing keys in the array`. So, change order to optimize. Example: if the order of keys: 1, 2, 3, 4 => just add to end of sparse array (in O(1)). If the keys aren't increase order. ex: 1, 5, 2, 4, 3 => add to sparse array in O(N) (it's like insert to index).
 
 ✔️ Using `SparseArray` with correct type instead primitive type to better performance
 - Such as using `SparseBooleanArray` instead `SparseArray`. It does not need to check with object `Boolean`.
@@ -79,8 +80,10 @@ I think after 5 years worked in MyFiles team of SRV, I have learned more tricks 
 ✔️ Remove `Log` in loop
 
 ✔️ Prevent using `file.exist()` because it's very expensive call
+- Can use it after do operation like as `renameTo`, instead check as a pre-action.
 
 ✔️ Reduce unnecessary call get data in loop
+- Prepare get list or large data variable outside loop, and use it, instead get it on each step of loop.
 
 ✔️ Add key/params for refresh or sync data when you need, not always
 - Avoid call many request to Repository/DAO: using one call to insert/delete a list, instead call each request for an insert/delete command (if posible).
@@ -90,4 +93,46 @@ I think after 5 years worked in MyFiles team of SRV, I have learned more tricks 
 - Media Provider changed when has `count of id` and `sum of id` changed when compare to previous saved value.
 - This above way is deprecated, please using `MediaStore.getGeneration()` to get last generation changed.
 
-✔️ _updating_
+✔️ Cache cursor when query if raw record is large than `MAX_LIMIT_RAW` (10000 ~ 20000)
+- Check if `cursor.getCount()` is large than `MAX_LIMIT_RAW`.
+- If this value is large, please check `MAX_WINDOW_SIZE` - this is number of elements was combine by row and column index.
+- If this window size is equals or higher than `MAX_WINDOW_SIZE`, please using a `MatrixCursor` to clone it and save it to a cache cursor.
+- Using it for call later. And if possible, please using a SparseArray of `FileInfoConverter` with `cursor` as a param to convert file from cache if you still performs search on a lifecycle.
+
+✔️ Using `CancellationSignal` when query from `ContentResolver`
+- Cancel previous query if user continues make new query.
+- If you have new request query, please check previous cancellation signal is existed or not => If existed, `cancel()` it and set to `null`. Then, create new `CancellationSignal` for new request.
+- If you have many session, please using SparseArray `cancellationSignalMap` with `sessionId` to manage it and cancel corresponding.
+
+✔️ Separate to more item if necessary, such as separate single `RecyclerAdapter` to more `RecyclerAdapter` for proper purpose.
+
+✔️ Check `currentVersion` in local is different with `version` from server before update or load.
+- Using a intermediate variable, it prevents unnecessary call to server to check version if you are in a session.
+
+✔️ Using `AtomicBoolean` to check and compare a task is during execute, before execute other task
+- Using `compareAndSet` to check, hold and set.
+
+✔️ Using `REGEX` instead `LIKE` when search file extension
+- Instead using `LIKE` operator (example: `_display_name LIKE '%.HTML' OR _display_name LIKE '%.PDF'`), please using `(_display_name REGEXP ('(?i).*\.(%s)$'))`.
+- `%s` in below query is set of file extensions that you need, you can collect it by using `stream` operator for list extensions and `join` it to a `String`.
+
+✔️ Avoid call many request to Media Provider only retrieve some value like `SUM`, `COUNT`, etc.
+- You should request only one query, and select your return values you need under a `cursor`, and then collect it.
+
+✔️ Cache data if possible, avoid query again many times
+
+✔️
+
+✔️
+
+✔️
+
+✔️
+
+✔️
+
+✔️
+
+✔️
+
+✔️
