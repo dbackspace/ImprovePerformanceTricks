@@ -183,4 +183,9 @@ I think after 5 years worked in MyFiles team of SRV, I have learned more tricks 
 - In `?`, please attach your folder like that: `fullPath + File.separatorChar + '%'` to query all files inside this folder.
 - Using `ContentResolver` for query this uri `MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL)`, and then add selection `"SUM(" + MediaStore.Files.FileColumns.SIZE + ')'`. The long value you get from column index 0 is total size of this folder you need.
 
+✔️ Update necessary item if only it has changed
+- Instead request update all recommend cards after uninstalled any app, you can only update `app` cards and update it to `RecyclerView` by `notifyItemChanged`.
+- Notice that do not forget remove old `app` card before insert and update new card.
+- To more improve, if old card is not existed in `RecyclerView`, please skip to update for it.
+
 ✔️ _updating_
