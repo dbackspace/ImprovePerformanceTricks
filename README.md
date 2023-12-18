@@ -10,6 +10,7 @@ I think after 5 years worked in MyFiles team of SRV, I have learned more tricks 
 ✔️ Improve delete from Media Provider
 - Divider number of delete operation for each batch when call applyBatch().
 - Using set IN of `id` instead compare by `name` column.
+- Remember that before you use it method is each query clause has maximum window is 1MB (`1,048,576 bytes`). If each item in `IN` clause is `Long` type, it takes `8 bytes` to save it. If it is `String` type, it has `4096 bytes` for max value. So, for example `Long` type, you have max `131,072 target files` can be passed to query clause. But, if it greater than `32,766`, please `batch` it to more operation with less than `30,000` target files (except about `2000` for other operator clause before or after `IN`).
 
 ✔️ Optimize entry performance when open Analyze Storage first time
 - Move heavy task to background (`Dispatchers.IO` in viewModelScope).
