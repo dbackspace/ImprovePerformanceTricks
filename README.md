@@ -193,4 +193,6 @@ I think after 5 years worked in MyFiles team of SRV, I have learned more tricks 
 - If you have more than one condition to check in `if` statement and these separated by `||` or `&&` operator, please change the order of these so that specific conditions are checked later to avoid checking multiple times.
 - For example in MyFiles, if you set loading false (is a `LiveData` variable) by condition to check `usedSize > 0` after `usageDetailData` (is also a `LiveData` variable) retrieved size of storages success, it has issue if state of `SD Card` storage is `unmounted` (because it is unmounted, and it can not has `usedSize`). So, you added an condition to check it if you encounter this case `(DomainType.isSd(domainType) && StorageVolumeManager.unmounted(domainType)) || usedSize > 0`. It is okay, but please see again to this condition, you are always calling method to check unmounted state of `SD Card`, this is redundant. So for an improved performance condition, please move this to back. This new condition is  `usedSize > 0 || (DomainType.isSd(domainType) && StorageVolumeManager.unmounted(domainType))`, and you can not have multiple unnecessary call. 
 
+✔️ Load partial data instead load full data in once
+
 ✔️ _updating_
